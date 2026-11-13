@@ -1,0 +1,55 @@
+name: Sync plugin releases
+
+# Hands-off updates: after a plugin is listed, new GitHub tags on its repo
+# are picked up here. Contributors do not need another registry PR per release.
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [plugin-release]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-releases
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Sync registry entries from plugin repos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/sync-releases.mjs
+
+      - name: Rebuild index when entries changed
+        id: changes
+        run: |
+          if git diff --quiet registry/plugins/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No release updates"
+            exit 0
+          fi
+          npm run aggregate
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit sync
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "rolodex-plugins-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add registry/plugins/ dist/
+          git commit -m "chore(registry): sync plugin releases"
+          git push

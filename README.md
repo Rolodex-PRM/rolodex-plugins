@@ -13,8 +13,9 @@ Plugin **code** and **README** live in **your** public GitHub repo. This registr
 
 - Each plugin is one file: `registry/plugins/<id>.json`
 - CI validates every pull request
-- On merge, the publish workflow regenerates `dist/index.json`
-- Rolodex fetches that index, downloads the pinned GitHub tag archive, checks the hash, and unpacks `rolodex-plugin.json` plus the HTML page
+- On merge, publish regenerates `dist/index.json` (the live catalog Rolodex fetches)
+- A sync workflow watches listed plugin repos for newer version tags and updates those JSON files for you
+- Rolodex downloads the pinned tag archive, checks the hash, and unpacks the page — no Rolodex release required to list or bump a plugin
 
 **Discovery URL (what Rolodex hits):**
 
@@ -22,42 +23,34 @@ Plugin **code** and **README** live in **your** public GitHub repo. This registr
 https://raw.githubusercontent.com/Rolodex-PRM/rolodex-plugins/main/dist/index.json
 ```
 
-When GitHub Pages is enabled for this repo, the same file is also served at:
+When GitHub Pages is enabled:
 
 ```
 https://rolodex-prm.github.io/rolodex-plugins/index.json
 ```
 
-## Add your plugin
+## Add your plugin (one JSON file)
 
-1. **Build** with [`@rolodex/plugin-sdk`](https://github.com/Rolodex-PRM/rolodex/tree/main/plugin-sdk):
-
-   ```sh
-   npx rolodex-plugin create
-   npx rolodex-plugin validate
-   ```
-
-2. **Publish** a public GitHub release. Tag it with the plugin version (for example `v1.0.0`). Put `rolodex-plugin.json` and the HTML page at the repository root (or in one folder if you set `path` in the entry).
-
-3. **Hash** the tag archive Rolodex will download:
+1. Build and ship a public GitHub release (`rolodex-plugin create` / `validate`, tag `v1.0.0`, `rolodex-plugin.json` + HTML at the repo root).
+2. Fork this repo and add **only** `registry/plugins/<id>.json` from [`schema/example-entry.json`](./schema/example-entry.json).
+3. Set `repo`, `release`, and `sha256` of that tag archive:
 
    ```sh
    curl -sL "https://github.com/<owner>/<repo>/archive/refs/tags/v1.0.0.zip" | shasum -a 256
    ```
 
-4. **Open a PR** that adds only `registry/plugins/<id>.json`. Copy [`schema/example-entry.json`](./schema/example-entry.json). Do not edit `dist/` — it is generated on merge.
+4. Open the PR. Do not edit `dist/`.
+
+After merge, ship new tags on **your** repo. Sync picks them up (every few hours, or trigger `plugin-release` via `repository_dispatch`). You should not need another registry PR for routine version bumps.
 
 ### Entry checklist
 
 - [ ] Filename is `<id>.json` and matches the `id` field
-- [ ] `id`, `version`, `entry`, and `rolodex` match `rolodex-plugin.json` in the release
-- [ ] `repo` is `owner/name`
-- [ ] `release` is the git tag (for example `v1.0.0`)
-- [ ] `sha256` is the SHA-256 of that tag’s `.zip` archive
-- [ ] `rolodex` is a range such as `>=0.1.0 <1.0.0`
+- [ ] `id` / `version` / `entry` / `rolodex` match the release manifest
+- [ ] `repo` is `owner/name`, `release` is the tag, `sha256` is that tag zip
 - [ ] You did not change `dist/`
 
-See [`schema/plugin-entry.schema.json`](./schema/plugin-entry.schema.json) for the full shape.
+See [`schema/plugin-entry.schema.json`](./schema/plugin-entry.schema.json).
 
 ## Local checks
 

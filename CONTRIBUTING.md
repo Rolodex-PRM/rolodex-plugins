@@ -20,4 +20,16 @@ Do not edit `dist/`. Maintainers regenerate it on merge.
 
 ## Updating a listed plugin
 
-Edit the same `registry/plugins/<id>.json` file: bump `version`, point `release` at the new tag, and set the new `sha256`. Keep `id` and `repo` stable.
+Preferred: publish a new version tag on your plugin repo (`v1.1.0`, etc.). The sync workflow updates `registry/plugins/<id>.json` and republishes `dist/index.json`. Keep `id` and `repo` stable.
+
+Manual override: edit the same JSON (new `version` / `release` / `sha256`) in a PR.
+
+Optional: from your plugin repo’s release workflow, notify this registry immediately:
+
+```yaml
+- uses: peter-evans/repository-dispatch@v3
+  with:
+    token: ${{ secrets.ROLODEX_PLUGINS_DISPATCH }}
+    repository: Rolodex-PRM/rolodex-plugins
+    event-type: plugin-release
+```
