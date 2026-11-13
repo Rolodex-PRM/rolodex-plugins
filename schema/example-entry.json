@@ -1,0 +1,17 @@
+{
+  "id": "my-page",
+  "name": "My page",
+  "author": "Your Name",
+  "version": "1.0.0",
+  "description": "What this page is for.",
+  "entry": "index.html",
+  "rolodex": ">=0.1.0 <1.0.0",
+  "permissions": ["data:own"],
+  "settings": [
+    { "key": "heading", "label": "Heading", "type": "text" }
+  ],
+  "repo": "you/your-plugin",
+  "release": "v1.0.0",
+  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "license": "MIT"
+}

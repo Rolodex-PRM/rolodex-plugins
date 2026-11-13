@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rolodex-prm.github.io/rolodex-plugins/schema/plugin-entry.schema.json",
+  "title": "Rolodex plugin registry entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "version",
+    "description",
+    "entry",
+    "repo",
+    "release",
+    "sha256",
+    "rolodex"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 40,
+      "description": "Must match the filename registry/plugins/<id>.json and rolodex-plugin.json."
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "version": { "type": "string", "minLength": 1, "maxLength": 20 },
+    "description": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "entry": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9.-]+\\.html$",
+      "description": "HTML file at the plugin root inside the release archive."
+    },
+    "rolodex": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Semver range of Rolodex versions this plugin supports, e.g. >=0.1.0 <1.0.0."
+    },
+    "permissions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "contacts:read",
+          "data:own",
+          "files:own",
+          "ai:suggest",
+          "profile:section"
+        ]
+      }
+    },
+    "settings": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "label", "type"],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 40
+          },
+          "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "type": { "type": "string", "enum": ["text", "boolean"] }
+        }
+      }
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
+      "description": "Public GitHub repository as owner/name."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Optional folder inside the tag archive that contains rolodex-plugin.json."
+    },
+    "release": {
+      "type": "string",
+      "pattern": "^v?[0-9]+\\.[0-9]+\\.[0-9]+(?:[+-][A-Za-z0-9.-]+)?$",
+      "description": "Git tag Rolodex downloads (archive/refs/tags/<release>.zip)."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 of the GitHub tag zip archive."
+    },
+    "asset": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+\\.zip$",
+      "description": "Reserved for a future release-asset zip name. Default install uses the tag archive."
+    },
+    "license": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "author": { "type": "string", "minLength": 1, "maxLength": 80 }
+  }
+}

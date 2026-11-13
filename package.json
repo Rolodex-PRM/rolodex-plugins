@@ -1,0 +1,18 @@
+{
+  "name": "rolodex-plugins",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Community registry for Rolodex plugins. Static index; no server.",
+  "scripts": {
+    "aggregate": "node build/aggregate.mjs",
+    "validate": "node scripts/validate-entry.mjs",
+    "pages": "node build/pages.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "semver": "^7.7.2"
+  },
+  "license": "MIT"
+}
